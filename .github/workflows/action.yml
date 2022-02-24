@@ -4,9 +4,9 @@ name: Action_Kernel
 on:
 
   push:
-    branches: [ GCC-4.9 ]
+    branches: [ Clang ]
   pull_request:
-    branches: [ GCC-4.9 ]
+    branches: [ Clang ]
 
 
 
@@ -41,12 +41,10 @@ jobs:
 
       - name: Setup Environment
         run: |
-          cd $GITHUB_WORKSPACE/kernel
-          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 -b lineage-18.1 tool/aarch
-          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 -b lineage-18.1 tool/arm
+          git clone --depth=1 https://github.com/kdrag0n/proton-clang $CLANG_PATH
           sh -c "$(curl -sSL https://github.com/akhilnarang/scripts/raw/master/setup/android_build_env.sh/)"
 
-      - name: make kernel
+      - name: Make kernel
         run: |
           sudo mv build.sh $GITHUB_WORKSPACE/kernel
           cd $GITHUB_WORKSPACE/kernel
