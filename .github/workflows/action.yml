@@ -1,0 +1,60 @@
+name: Action_Kernel
+
+
+on:
+
+  push:
+    branches: [ GCC-4.9 ]
+  pull_request:
+    branches: [ GCC-4.9 ]
+
+
+
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-18.04
+
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Load Configuration
+        uses: falti/dotenv-action@v0.2.5
+        id: config
+        with:
+          path: config.env
+
+      - name: Check Configuration
+        run: |
+          function required () { if ! [[ "$1" ]]; then echo "$2 variable can't be null." && exit 1; fi }
+          required "${{ steps.config.outputs.kernel_name }}" "KERNEL_NAME config"
+          required "${{ steps.config.outputs.branch_name }}" "BRANCH_NAME config"
+          required "${{ steps.config.outputs.kernel_url }}" "KERNEL_URL config"
+ 
+      - name: Git kernel
+        run: |
+          git clone "${{ steps.config.outputs.kernel_url }}" -b "${{ steps.config.outputs.branch_name }}" kernel
+
+      - name: Setup Environment
+        run: |
+          cd $GITHUB_WORKSPACE/kernel
+          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 -b lineage-18.1 tool/aarch
+          git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 -b lineage-18.1 tool/arm
+          sh -c "$(curl -sSL https://github.com/akhilnarang/scripts/raw/master/setup/android_build_env.sh/)"
+
+      - name: make kernel
+        run: |
+          sudo mv build.sh $GITHUB_WORKSPACE/kernel
+          cd $GITHUB_WORKSPACE/kernel
+          bash ./build.sh
+
+      - name: Upload to Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "kernel/out/arch/arm64/boot/Image.gz-dtb"
+          tag: "${{ steps.config.outputs.kernel_name }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
