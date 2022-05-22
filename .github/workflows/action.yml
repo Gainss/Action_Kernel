@@ -2,11 +2,8 @@ name: Action_Kernel
 
 
 on:
-
-  push:
-    branches: [ Clang ]
-  pull_request:
-    branches: [ Clang ]
+  watch:
+    types: [started]
 
 
 
