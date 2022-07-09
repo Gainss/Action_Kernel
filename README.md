@@ -16,4 +16,4 @@
 
 ----------
 
-详细教程：[GainsのBlog](http://gainss.xyz/index.php/project/Action_Kernel.html)
+详细教程：[GainsのBlog](http://blog.gainss.xyz/index.php/project/Action_Kernel.html)
